@@ -1,0 +1,131 @@
+name: 🧪 Tests POSIX
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  job:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false # Continue testing even if one job fails, they are likely agnostic of each other
+      matrix:
+        include:
+          # Ubuntu jobs
+          - name: Ubuntu | g++-11 | C++17
+            os: ubuntu-24.04
+            compiler: g++-11
+            cxxstd: 17
+            install: "sudo apt update && sudo apt install g++-11"
+          - name: Ubuntu | g++-11 | C++20
+            os: ubuntu-24.04
+            compiler: g++-11
+            cxxstd: 20
+            install: "sudo apt update && sudo apt install g++-11"
+          - name: Ubuntu | g++-12 | C++17
+            os: ubuntu-24.04
+            compiler: g++-12
+            cxxstd: 17
+            install: "sudo apt update && sudo apt install g++-12"
+          - name: Ubuntu | g++-12 | C++20
+            os: ubuntu-24.04
+            compiler: g++-12
+            cxxstd: 20
+            install: "sudo apt update && sudo apt install g++-12"
+          - name: Ubuntu | g++-13 | C++17
+            os: ubuntu-24.04
+            compiler: g++-13
+            cxxstd: 17
+            install: "sudo apt update && sudo apt install g++-13"
+          - name: Ubuntu | g++-13 | C++20
+            os: ubuntu-24.04
+            compiler: g++-13
+            cxxstd: 20
+            install: "sudo apt update && sudo apt install g++-13"
+            coverage: true
+
+          # macOS jobs
+          - name: macOS | g++-11 | C++17
+            os: macos-latest
+            compiler: g++-11
+            cxxstd: 17
+            install: "brew install gcc@11"
+          - name: macOS | g++-11 | C++20
+            os: macos-latest
+            compiler: g++-11
+            cxxstd: 20
+            install: "brew install gcc@11"
+          - name: macOS | g++-12 | C++17
+            os: macos-latest
+            compiler: g++-12
+            cxxstd: 17
+            install: "brew install gcc@12"
+          - name: macOS | g++-12 | C++20
+            os: macos-latest
+            compiler: g++-12
+            cxxstd: 20
+            install: "brew install gcc@12"
+          - name: macOS | g++-13 | C++17
+            os: macos-latest
+            compiler: g++-13
+            cxxstd: 17
+            install: "brew install gcc@13"
+          - name: macOS | g++-13 | C++20
+            os: macos-latest
+            compiler: g++-13
+            cxxstd: 20
+            install: "brew install gcc@13"
+
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        if: ${{ matrix.install != '' }}
+        run: |
+          ${{ matrix.install }}
+
+      - name: Configure CMake
+        shell: bash
+        working-directory: ${{github.workspace}}
+        run: |
+          cmake -S . -B build \
+          -DCMAKE_CXX_COMPILER=${{ matrix.compiler }} \
+          -DCMAKE_CXX_STANDARD=${{ matrix.cxxstd }} \
+          -DCMAKE_BUILD_TYPE=${{ matrix.os == 'ubuntu-24.04' && 'Asan' || 'Release' }} \
+          -DBUILD_TESTS=True
+
+      - name: Build
+        shell: bash
+        working-directory: ${{github.workspace}}/build
+        run: cmake --build .
+
+      - name: Run Unit Tests
+        shell: bash
+        working-directory: ${{github.workspace}}/build
+        run: |
+          cmake --build . --target run-unittests
+
+      - name: Generate Code Coverage
+        if: ${{ matrix.coverage }}
+        working-directory: ${{github.workspace}}/build
+        run: |
+          sudo apt install gcovr
+          cmake --build . --target coverage
+
+      - name: Code Coverage Report
+        if: ${{ matrix.coverage }}
+        uses: insightsengineering/coverage-action@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{github.workspace}}/build/coverage/coverage.xml
+          threshold: 90
+          fail: true
+          publish: false
+          diff: true
+          diff-branch: master
+          diff-storage: _xml_coverage_reports
+          coverage-summary-title: "Code Coverage Summary"

@@ -1,0 +1,63 @@
+name: 🧪 Tests Windows
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  job:
+    name: ${{ matrix.name }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false # Continue testing even if one job fails, they are likely agnostic of each other
+      matrix:
+        include:
+          - name: Windows | cl | C++17
+            compiler: cl
+            cxxstd: 17
+          - name: Windows | cl | C++20
+            compiler: cl
+            cxxstd: 20
+          - name: Windows | g++ | C++17
+            compiler: g++.exe
+            cxxstd: 17
+            install: "choco install mingw"
+          - name: Windows | g++ | C++20
+            compiler: g++.exe
+            cxxstd: 20
+            install: "choco install mingw"
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        if: ${{ matrix.install != '' }}
+        run: |
+          ${{ matrix.install }}
+
+      - name: Configure CMake
+        shell: powershell
+        working-directory: ${{github.workspace}}
+        run: |
+          $env:Path = 'C:/ProgramData/mingw64/mingw64/bin;' + $env:Path
+          cmake -S . -B build `
+          ${{ matrix.compiler != 'cl' && '-G "MinGW Makefiles"' || '' }} `
+          -DCMAKE_CXX_COMPILER=${{ matrix.compiler }} `
+          -DCMAKE_CXX_STANDARD=${{ matrix.cxxstd }} `
+          -DCMAKE_BUILD_TYPE=Release `
+          -DBUILD_TESTS=True
+
+      - name: Build
+        working-directory: ${{github.workspace}}/build
+        run: cmake --build . --config Release
+
+      - name: Run Unit Tests
+        shell: powershell
+        working-directory: ${{github.workspace}}/build
+        run: |
+          $env:Path = 'C:/ProgramData/mingw64/mingw64/bin;' + $env:Path
+          $env:Path = 'C:/ProgramData/mingw64/mingw64/lib;' + $env:Path
+          cmake --build . --target run-unittests
+
