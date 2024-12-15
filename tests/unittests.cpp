@@ -685,6 +685,69 @@ TEST_CASE("zero min max") {
     CHECK((100.0_MB).max() == megabytes_ld(std::numeric_limits<long double>::max()));
 }
 
+TEST_CASE("abs") {
+    CHECK(digital::abs(0_EiB) == 0_EiB);
+
+    CHECK(digital::abs(1_EiB) == 1_EiB);
+    CHECK(digital::abs(1024_EiB) == 1024_EiB);
+
+    CHECK(digital::abs(-1_EiB) == 1_EiB);
+    CHECK(digital::abs(-1024_EiB) == 1024_EiB);
+}
+
+TEST_CASE("floor") {
+    CHECK(digital::floor<digital::kilobytes>(999_B) == 0_KB);
+    CHECK(digital::floor<digital::kilobytes>(1000_B) == 1_KB);
+    CHECK(digital::floor<digital::kilobytes>(1001_B) == 1_KB);
+    CHECK(digital::floor<digital::kilobytes>(1999_B) == 1_KB);
+
+    CHECK(digital::floor<digital::kilobytes>(-999_B) == -1_KB);
+    CHECK(digital::floor<digital::kilobytes>(-1000_B) == -1_KB);
+    CHECK(digital::floor<digital::kilobytes>(-1001_B) == -2_KB);
+    CHECK(digital::floor<digital::kilobytes>(-1999_B) == -2_KB);
+}
+
+TEST_CASE("ceil") {
+    CHECK(digital::ceil<digital::kilobytes>(999_B) == 1_KB);
+    CHECK(digital::ceil<digital::kilobytes>(1000_B) == 1_KB);
+    CHECK(digital::ceil<digital::kilobytes>(1001_B) == 2_KB);
+    CHECK(digital::ceil<digital::kilobytes>(1999_B) == 2_KB);
+
+    CHECK(digital::ceil<digital::kilobytes>(-999_B) == 0_KB);
+    CHECK(digital::ceil<digital::kilobytes>(-1000_B) == -1_KB);
+    CHECK(digital::ceil<digital::kilobytes>(-1001_B) == -1_KB);
+    CHECK(digital::ceil<digital::kilobytes>(-1999_B) == -1_KB);
+}
+
+TEST_CASE("round") {
+    CHECK(digital::round<digital::kilobytes>(0_B) == 0_KB);
+    CHECK(digital::round<digital::kilobytes>(1_B) == 0_KB);
+    CHECK(digital::round<digital::kilobytes>(499_B) == 0_KB);
+
+    CHECK(digital::round<digital::kilobytes>(501_B) == 1_KB);
+    CHECK(digital::round<digital::kilobytes>(999_B) == 1_KB);
+    CHECK(digital::round<digital::kilobytes>(1000_B) == 1_KB);
+    CHECK(digital::round<digital::kilobytes>(1001_B) == 1_KB);
+    CHECK(digital::round<digital::kilobytes>(1499_B) == 1_KB);
+
+    CHECK(digital::round<digital::kilobytes>(1999_B) == 2_KB);
+
+    // Round half-even (bankers' rounding)
+    CHECK(digital::round<digital::kilobytes>(500_B) == 0_KB);
+    CHECK(digital::round<digital::kilobytes>(1500_B) == 2_KB);
+    CHECK(digital::round<digital::kilobytes>(2500_B) == 2_KB);
+    CHECK(digital::round<digital::kilobytes>(3500_B) == 4_KB);
+
+    CHECK(digital::round<digital::kilobytes>(-1_B) == 0_KB);
+    CHECK(digital::round<digital::kilobytes>(-499_B) == 0_KB);
+    CHECK(digital::round<digital::kilobytes>(-500_B) == 0_KB);
+    CHECK(digital::round<digital::kilobytes>(-501_B) == -1_KB);
+    CHECK(digital::round<digital::kilobytes>(-1000_B) == -1_KB);
+    CHECK(digital::round<digital::kilobytes>(-1499_B) == -1_KB);
+    CHECK(digital::round<digital::kilobytes>(-1500_B) == -2_KB);
+    CHECK(digital::round<digital::kilobytes>(-1999_B) == -2_KB);
+}
+
 TEST_CASE("hash") {
     CHECK(std::hash<digital::kibibytes>{}(1_KiB) == std::hash<std::int64_t>{}(1));
     CHECK(std::hash<digital::kibibytes>{}(1_KiB) != std::hash<digital::bytes>{}(1024_B));

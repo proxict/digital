@@ -608,6 +608,46 @@ template <typename TRep1, typename TRatio1, typename TRep2, typename TRatio2>
     return TCT(TCT(lhs).value() % TCT(rhs).value());
 }
 
+template <typename TRep, typename TRatio>
+[[nodiscard]] constexpr auto abs(const unit<TRep, TRatio> v) {
+    return v >= v.zero() ? v : -v;
+}
+
+template <typename TToUnit, typename TRep, typename TRatio>
+[[nodiscard]] constexpr auto floor(const unit<TRep, TRatio>& v
+) -> std::enable_if_t<detail::is_specialization_of_v<TToUnit, unit>, TToUnit> {
+    const auto res = unit_cast<TToUnit>(v);
+    return res > v ? (res - TToUnit{ 1 }) : res;
+}
+
+template <typename TToUnit, typename TRep, typename TRatio>
+[[nodiscard]] constexpr auto ceil(const unit<TRep, TRatio>& v
+) -> std::enable_if_t<detail::is_specialization_of_v<TToUnit, unit>, TToUnit> {
+    const auto res = unit_cast<TToUnit>(v);
+    return res < v ? (res + TToUnit{ 1 }) : res;
+}
+
+/// Round half-even (bankers' rounding)
+template <typename TToUnit, typename TRep, typename TRatio>
+[[nodiscard]] constexpr auto round(const unit<TRep, TRatio>& v)
+    -> std::enable_if_t<
+        detail::is_specialization_of_v<TToUnit, unit> && !std::is_floating_point_v<typename TToUnit::rep>,
+        TToUnit> {
+    const TToUnit v1 = floor<TToUnit>(v);
+    const TToUnit v2 = v1 + TToUnit{ 1 };
+    const auto d1 = v - v1;
+    const auto d2 = v2 - v;
+    if (d1 == d2) {
+        if (v1.value() & 1) {
+            return v2;
+        }
+        return v1;
+    } else if (d1 < d2) {
+        return v1;
+    }
+    return v2;
+}
+
 inline namespace literals {
     inline namespace unit_literals {
         // Technically, we could easily get away with:
