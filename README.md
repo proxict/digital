@@ -1,4 +1,4 @@
-![GitHub](https://img.shields.io/github/license/proxict/digital)
+[![License: MIT](https://img.shields.io/badge/License-MIT-gren.svg)](./LICENSE)
 [![Tests](https://github.com/proxict/digital/actions/workflows/posix.yml/badge.svg)](https://github.com/proxict/digital/actions/workflows/posix.yml)
 [![Tests](https://github.com/proxict/digital/actions/workflows/windows.yml/badge.svg)](https://github.com/proxict/digital/actions/workflows/windows.yml)
 
@@ -250,11 +250,20 @@ For more examples, consult the [unit tests](./tests/unittests.cpp).
 Returns the numeric value (in the underlying `TRep` type) of the unit.
 
 ### Conversion Function
-- **`prox::digital::unit_cast`**: Converts a unit to a different unit.
+- **`prox::digital::unit_cast(unit v)`**: Converts a unit to a different unit.
 
 ### Utility Functions
 - **`prox::digital::unit::zero()`**: Returns a unit with a value of 0.
 - **`prox::digital::unit::min()`**: Returns a unit with the smallest possible value for the unit.
 - **`prox::digital::unit::max()`**: Returns a unit with the largest possible value for the unit.
 
+- **`prox::digital::abs(unit v)`**:
+Returns the absolute value of the unit.
+- **`TToUnit prox::digital::floor(unit v)`**:
+Returns the greatest unit representable in `TToUnit` that is less or equal to the given unit `v`.
+- **`TToUnit prox::digital::ceil(unit v)`**:
+Returns the smallest unit representable in `TToUnit` that is greater or equal to the given unit `v`.
+- **`TToUnit prox::digital::round(unit v)`**:
+Returns a unit representable in `TToUnit` that is closest to the given unit `v`.
+If there are two such values, returns the even value (_half-even or bankers' rounding_).
 ---
