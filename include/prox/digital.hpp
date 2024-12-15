@@ -378,7 +378,7 @@ using pebibytes = unit<std::int64_t, pebi>;
 using exbibytes = unit<std::int64_t, exbi>;
 
 template <typename TTo, typename TRep, typename TRatio>
-constexpr auto unit_cast(unit<TRep, TRatio> from
+[[nodiscard]] constexpr auto unit_cast(unit<TRep, TRatio> from
 ) -> std::enable_if_t<detail::is_specialization_of_v<TTo, unit>, TTo> {
     if constexpr (std::is_same_v<TTo, unit<TRep, TRatio>>) {
         return from;
@@ -395,9 +395,9 @@ public:
     using rep = TRep;
     using ratio = TRatio;
 
-    static constexpr TRep zero() { return TRep(0); }
-    static constexpr TRep min() { return std::numeric_limits<TRep>::lowest(); }
-    static constexpr TRep max() { return std::numeric_limits<TRep>::max(); }
+    [[nodiscard]] static constexpr TRep zero() { return TRep(0); }
+    [[nodiscard]] static constexpr TRep min() { return std::numeric_limits<TRep>::lowest(); }
+    [[nodiscard]] static constexpr TRep max() { return std::numeric_limits<TRep>::max(); }
 
     constexpr unit() = default;
 
@@ -427,11 +427,11 @@ public:
 
     ~unit() = default;
 
-    constexpr TRep value() const { return mValue; }
+    [[nodiscard]] constexpr TRep value() const { return mValue; }
 
-    constexpr auto operator+() const { return unit(mValue); }
+    [[nodiscard]] constexpr auto operator+() const { return unit(mValue); }
 
-    constexpr auto operator-() const { return unit(-mValue); }
+    [[nodiscard]] constexpr auto operator-() const { return unit(-mValue); }
 
     constexpr unit& operator++() {
         ++mValue;
@@ -485,7 +485,7 @@ private:
 
 /// Comparison operators
 template <typename TRep1, typename TRatio1, typename TRep2, typename TRatio2>
-constexpr bool operator==(
+[[nodiscard]] constexpr bool operator==(
     const PROX_DIGITAL_NAMESPACE_NAME::unit<TRep1, TRatio1>& lhs,
     const PROX_DIGITAL_NAMESPACE_NAME::unit<TRep2, TRatio2>& rhs
 ) {
@@ -498,7 +498,7 @@ constexpr bool operator==(
 }
 
 template <typename TRep1, typename TRatio1, typename TRep2, typename TRatio2>
-constexpr bool operator!=(
+[[nodiscard]] constexpr bool operator!=(
     const PROX_DIGITAL_NAMESPACE_NAME::unit<TRep1, TRatio1>& lhs,
     const PROX_DIGITAL_NAMESPACE_NAME::unit<TRep2, TRatio2>& rhs
 ) {
@@ -506,7 +506,7 @@ constexpr bool operator!=(
 }
 
 template <typename TRep1, typename TRatio1, typename TRep2, typename TRatio2>
-constexpr bool operator<(
+[[nodiscard]] constexpr bool operator<(
     const PROX_DIGITAL_NAMESPACE_NAME::unit<TRep1, TRatio1>& lhs,
     const PROX_DIGITAL_NAMESPACE_NAME::unit<TRep2, TRatio2>& rhs
 ) {
@@ -519,7 +519,7 @@ constexpr bool operator<(
 }
 
 template <typename TRep1, typename TRatio1, typename TRep2, typename TRatio2>
-constexpr bool operator<=(
+[[nodiscard]] constexpr bool operator<=(
     const PROX_DIGITAL_NAMESPACE_NAME::unit<TRep1, TRatio1>& lhs,
     const PROX_DIGITAL_NAMESPACE_NAME::unit<TRep2, TRatio2>& rhs
 ) {
@@ -527,7 +527,7 @@ constexpr bool operator<=(
 }
 
 template <typename TRep1, typename TRatio1, typename TRep2, typename TRatio2>
-constexpr bool operator>(
+[[nodiscard]] constexpr bool operator>(
     const PROX_DIGITAL_NAMESPACE_NAME::unit<TRep1, TRatio1>& lhs,
     const PROX_DIGITAL_NAMESPACE_NAME::unit<TRep2, TRatio2>& rhs
 ) {
@@ -535,7 +535,7 @@ constexpr bool operator>(
 }
 
 template <typename TRep1, typename TRatio1, typename TRep2, typename TRatio2>
-constexpr bool operator>=(
+[[nodiscard]] constexpr bool operator>=(
     const PROX_DIGITAL_NAMESPACE_NAME::unit<TRep1, TRatio1>& lhs,
     const PROX_DIGITAL_NAMESPACE_NAME::unit<TRep2, TRatio2>& rhs
 ) {
@@ -544,21 +544,21 @@ constexpr bool operator>=(
 
 /// Arithmetic operators
 template <typename TRep1, typename TRatio1, typename TRep2, typename TRatio2>
-constexpr auto operator+(const unit<TRep1, TRatio1>& lhs, const unit<TRep2, TRatio2>& rhs)
+[[nodiscard]] constexpr auto operator+(const unit<TRep1, TRatio1>& lhs, const unit<TRep2, TRatio2>& rhs)
     -> std::common_type_t<unit<TRep1, TRatio1>, unit<TRep2, TRatio2>> {
     using TCT = std::common_type_t<decltype(lhs), decltype(rhs)>;
     return TCT(TCT(lhs).value() + TCT(rhs).value());
 }
 
 template <typename TRep1, typename TRatio1, typename TRep2, typename TRatio2>
-constexpr auto operator-(const unit<TRep1, TRatio1>& lhs, const unit<TRep2, TRatio2>& rhs)
+[[nodiscard]] constexpr auto operator-(const unit<TRep1, TRatio1>& lhs, const unit<TRep2, TRatio2>& rhs)
     -> std::common_type_t<unit<TRep1, TRatio1>, unit<TRep2, TRatio2>> {
     using TCT = std::common_type_t<decltype(lhs), decltype(rhs)>;
     return TCT(TCT(lhs).value() - TCT(rhs).value());
 }
 
 template <typename TRep1, typename TRatio, typename TRep2>
-constexpr unit<detail::common_rep<TRep1, TRep2>, TRatio> operator*(
+[[nodiscard]] constexpr unit<detail::common_rep<TRep1, TRep2>, TRatio> operator*(
     const unit<TRep1, TRatio>& lhs,
     const TRep2& rhs
 ) {
@@ -567,7 +567,7 @@ constexpr unit<detail::common_rep<TRep1, TRep2>, TRatio> operator*(
 }
 
 template <typename TRep1, typename TRep2, typename TRatio>
-constexpr unit<detail::common_rep<TRep2, TRep1>, TRatio> operator*(
+[[nodiscard]] constexpr unit<detail::common_rep<TRep2, TRep1>, TRatio> operator*(
     const TRep1& lhs,
     const unit<TRep2, TRatio>& rhs
 ) {
@@ -575,7 +575,7 @@ constexpr unit<detail::common_rep<TRep2, TRep1>, TRatio> operator*(
 }
 
 template <typename TRep1, typename TRatio, typename TRep2>
-constexpr unit<
+[[nodiscard]] constexpr unit<
     detail::common_rep<TRep1, std::enable_if_t<!detail::is_specialization_of_v<TRep2, unit>, TRep2>>,
     TRatio>
 operator/(const unit<TRep1, TRatio>& lhs, const TRep2& rhs) {
@@ -584,14 +584,14 @@ operator/(const unit<TRep1, TRatio>& lhs, const TRep2& rhs) {
 }
 
 template <typename TRep1, typename TRatio1, typename TRep2, typename TRatio2>
-constexpr auto operator/(const unit<TRep1, TRatio1>& lhs, const unit<TRep2, TRatio2>& rhs)
+[[nodiscard]] constexpr auto operator/(const unit<TRep1, TRatio1>& lhs, const unit<TRep2, TRatio2>& rhs)
     -> std::common_type_t<TRep1, TRep2> {
     using TCT = std::common_type_t<decltype(lhs), decltype(rhs)>;
     return TCT(lhs).value() / TCT(rhs).value();
 }
 
 template <typename TRep1, typename TRatio, typename TRep2>
-constexpr unit<
+[[nodiscard]] constexpr unit<
     detail::common_rep<TRep1, std::enable_if_t<!detail::is_specialization_of_v<TRep2, unit>, TRep2>>,
     TRatio>
 operator%(const unit<TRep1, TRatio>& lhs, const TRep2& rhs) {
@@ -600,7 +600,7 @@ operator%(const unit<TRep1, TRatio>& lhs, const TRep2& rhs) {
 }
 
 template <typename TRep1, typename TRatio1, typename TRep2, typename TRatio2>
-constexpr std::common_type_t<unit<TRep1, TRatio1>, unit<TRep2, TRatio2>> operator%(
+[[nodiscard]] constexpr std::common_type_t<unit<TRep1, TRatio1>, unit<TRep2, TRatio2>> operator%(
     const unit<TRep1, TRatio1>& lhs,
     const unit<TRep2, TRatio2>& rhs
 ) {
