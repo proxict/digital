@@ -254,7 +254,7 @@ Returns the numeric value (in the underlying `TRep` type) of the unit.
 
 ### Utility Functions
 - **`prox::digital::unit::zero()`**: Returns a unit with a value of 0.
-- **`prox::digital::unit::min()`**: Returns the smallest possible value for the unit.
-- **`prox::digital::unit::max()`**: Returns the largest possible value for the unit.
+- **`prox::digital::unit::min()`**: Returns a unit with the smallest possible value for the unit.
+- **`prox::digital::unit::max()`**: Returns a unit with the largest possible value for the unit.
 
 ---

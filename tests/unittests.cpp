@@ -675,8 +675,14 @@ TEST_CASE("mod operator") {
 }
 
 TEST_CASE("zero min max") {
-    CHECK(std::hash<digital::kibibytes>{}(1_KiB) == std::hash<std::int64_t>{}(1));
-    CHECK(std::hash<digital::kibibytes>{}(1_KiB) != std::hash<digital::bytes>{}(1024_B));
+    CHECK(digital::tebibytes::zero() == 0_TiB);
+    CHECK(digital::tebibytes::min() == digital::tebibytes(std::numeric_limits<std::int64_t>::lowest()));
+    CHECK(digital::tebibytes::max() == digital::tebibytes(std::numeric_limits<std::int64_t>::max()));
+
+    using megabytes_ld = digital::unit<long double, digital::mega>;
+    CHECK((100.0_MB).zero() == 0.0_MiB);
+    CHECK((100.0_MB).min() == megabytes_ld(std::numeric_limits<long double>::lowest()));
+    CHECK((100.0_MB).max() == megabytes_ld(std::numeric_limits<long double>::max()));
 }
 
 TEST_CASE("hash") {

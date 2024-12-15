@@ -395,9 +395,9 @@ public:
     using rep = TRep;
     using ratio = TRatio;
 
-    [[nodiscard]] static constexpr TRep zero() { return TRep(0); }
-    [[nodiscard]] static constexpr TRep min() { return std::numeric_limits<TRep>::lowest(); }
-    [[nodiscard]] static constexpr TRep max() { return std::numeric_limits<TRep>::max(); }
+    [[nodiscard]] static constexpr unit zero() { return unit{ TRep(0) }; }
+    [[nodiscard]] static constexpr unit min() { return unit{ std::numeric_limits<TRep>::lowest() }; }
+    [[nodiscard]] static constexpr unit max() { return unit{ std::numeric_limits<TRep>::max() }; }
 
     constexpr unit() = default;
 
